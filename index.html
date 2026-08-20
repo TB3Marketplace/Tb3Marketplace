@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TB3 Marketplace</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: white;
+    color: #111;
+}
+
+header {
+    height: 72px;
+    padding: 0 5%;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+.logo {
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.page {
+    max-width: 1400px;
+    margin: auto;
+    padding: 55px 5%;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+h1 {
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -1px;
+}
+
+.sort {
+    border: 1px solid #ddd;
+    background: white;
+    padding: 11px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    border-radius: 8px;
+}
+
+.products {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 55px 22px;
+}
+
+.product {
+    cursor: pointer;
+}
+
+.product-image {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f4f4f4;
+    overflow: hidden;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .3s;
+}
+
+.product:hover img {
+    transform: scale(1.03);
+}
+
+.product-name {
+    font-size: 15px;
+    margin-bottom: 7px;
+}
+
+.price {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 7px;
+}
+
+.stock {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 12px;
+}
+
+.low-stock {
+    color: #b06a00;
+}
+
+.out-stock {
+    color: #c62828;
+}
+
+.buy-now {
+    width: 100%;
+    padding: 11px 14px;
+    border: none;
+    background: #e11d2e;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.buy-now:hover {
+    background: #c91525;
+}
+
+
+/* PURCHASE POPUP */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 9999;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.purchase-modal {
+    width: 100%;
+    max-width: 440px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.2);
+
+    text-align: center;
+
+    animation: popup .2s ease-out;
+}
+
+@keyframes popup {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+.purchase-modal h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.purchase-product {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.purchase-price {
+    font-size: 15px;
+    color: #555;
+    margin-bottom: 22px;
+}
+
+.purchase-message {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #444;
+    margin-bottom: 20px;
+}
+
+.payment-method {
+    background: #f5f5f5;
+
+    border-radius: 8px;
+
+    padding: 14px;
+
+    margin-bottom: 22px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+.discord-button {
+    display: block;
+
+    width: 100%;
+
+    padding: 13px 16px;
+
+    background: #5865F2;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    margin-bottom: 10px;
+}
+
+.discord-button:hover {
+    background: #4752c4;
+}
+
+.close-button {
+    width: 100%;
+
+    padding: 12px 16px;
+
+    border: 1px solid #ddd;
+
+    background: white;
+
+    color: #111;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+.close-button:hover {
+    background: #f5f5f5;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 1000px) {
+
+    .products {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    header {
+        padding: 0 20px;
+    }
+
+    .page {
+        padding: 35px 18px;
+    }
+
+    .top h1 {
+        font-size: 28px;
+    }
+
+    .products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px 12px;
+    }
+
+    .purchase-modal {
+        padding: 25px 20px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="logo">
+        TB3 Marketplace
+    </div>
+
+</header>
+
+
+<main class="page">
+
+
+    <div class="top">
+
+        <h1>
+            All Products
+        </h1>
+
+
+        <select id="sort" class="sort">
+
+            <option value="featured">
+                Featured
+            </option>
+
+            <option value="low">
+                Price: Low to High
+            </option>
+
+            <option value="high">
+                Price: High to Low
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <section
+        class="products"
+        id="products"
+    ></section>
+
+
+</main>
+
+
+
+<!-- PURCHASE POPUP -->
+
+<div
+    class="modal-overlay"
+    id="purchaseModal"
+>
+
+    <div class="purchase-modal">
+
+
+        <h2>
+            Complete Your Purchase
+        </h2>
+
+
+        <div
+            class="purchase-product"
+            id="modalProduct"
+        >
+            Product
+        </div>
+
+
+        <div
+            class="purchase-price"
+            id="modalPrice"
+        >
+            $0.00
+        </div>
+
+
+        <div class="purchase-message">
+
+            To purchase this item, please join our
+            Discord and open a ticket.
+
+            <br>
+            <br>
+
+            A staff member will help you complete
+            your order.
+
+        </div>
+
+
+        <div class="payment-method">
+
+            PAYMENT METHOD: CASH APP ONLY
+
+        </div>
+
+
+        <a
+            class="discord-button"
+            href="https://discord.gg/XvmjewktMz"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+
+            Join Discord & Open a Ticket
+
+        </a>
+
+
+        <button
+            class="close-button"
+            type="button"
+            id="closeModal"
+        >
+
+            Close
+
+        </button>
+
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+
+/*
+====================================================
+PRODUCTS
+====================================================
+
+ADD YOUR PRODUCTS HERE.
+
+FORMAT:
+
+product("PRODUCT NAME", "IMAGE FILE", PRICE, STOCK),
+
+EXAMPLE:
+
+product("My Product", "myimage.png", 19.99, 25),
+
+====================================================
+*/
+
+
+const PRODUCT_LIST = [
+
+    product(
+        "10 G29 Buttons/Switches",
+        "G29BUTTON.jpg",
+        1.00,
+        999
+    ),
+
+    product(
+        "10 308 Ar",
+        "PIBKEARP308.jpg",
+        1.00,
+        999
+    ),
+
+    product(
+        "COMING SOON",
+        "https://placehold.co/700x700/f5f5f5/111111?text=Product+3",
+        24.99,
+        18
+    ),
+
+    product(
+        "COMING SOON",
+        "https://placehold.co/700x700/eeeeee/111111?text=Product+4",
+        14.99,
+        4
+    ),
+
+    product(
+        "COMING SOON",
+        "https://placehold.co/700x700/f1f1f1/111111?text=Product+5",
+        29.99,
+        31
+    ),
+
+    product(
+        "COMING SOON",
+        "https://placehold.co/700x700/e7e7e7/111111?text=Product+6",
+        92.99,
+        1555
+    ),
+
+    product(
+        "COMING SOON",
+        "https://placehold.co/700x700/f3f3f3/111111?text=Product+7",
+        39.99,
+        9
+    ),
+
+    product(
+        "COMING SOON",
+        "https://placehold.co/700x700/eaeaea/111111?text=Product+8",
+        7.99,
+        56
+    )
+
+];
+
+
+
+/*
+====================================================
+PRODUCT FUNCTION
+====================================================
+*/
+
+function product(
+    name,
+    image,
+    price,
+    stock
+) {
+
+    return {
+
+        name: name,
+
+        image: image,
+
+        price: price,
+
+        stock: stock
+
+    };
+
+}
+
+
+
+/*
+====================================================
+ELEMENTS
+====================================================
+*/
+
+const productsContainer =
+    document.getElementById("products");
+
+const sortMenu =
+    document.getElementById("sort");
+
+const purchaseModal =
+    document.getElementById("purchaseModal");
+
+const modalProduct =
+    document.getElementById("modalProduct");
+
+const modalPrice =
+    document.getElementById("modalPrice");
+
+const closeModal =
+    document.getElementById("closeModal");
+
+
+
+/*
+====================================================
+OPEN PURCHASE POPUP
+====================================================
+*/
+
+function openPurchaseModal(item) {
+
+    modalProduct.textContent =
+        item.name;
+
+    modalPrice.textContent =
+        "$" + item.price.toFixed(2);
+
+    purchaseModal.classList.add(
+        "active"
+    );
+
+}
+
+
+
+/*
+====================================================
+CLOSE PURCHASE POPUP
+====================================================
+*/
+
+function closePurchaseModal() {
+
+    purchaseModal.classList.remove(
+        "active"
+    );
+
+}
+
+
+closeModal.addEventListener(
+    "click",
+    closePurchaseModal
+);
+
+
+
+/*
+====================================================
+CLOSE WHEN CLICKING OUTSIDE
+====================================================
+*/
+
+purchaseModal.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target ===
+            purchaseModal
+        ) {
+
+            closePurchaseModal();
+
+        }
+
+    }
+);
+
+
+
+/*
+====================================================
+ESCAPE KEY
+====================================================
+*/
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key ===
+            "Escape"
+        ) {
+
+            closePurchaseModal();
+
+        }
+
+    }
+);
+
+
+
+/*
+====================================================
+DISPLAY PRODUCTS
+====================================================
+*/
+
+function displayProducts(products) {
+
+    productsContainer.innerHTML = "";
+
+
+    products.forEach(
+        function(item) {
+
+
+            const productElement =
+                document.createElement(
+                    "div"
+                );
+
+
+            productElement.className =
+                "product";
+
+
+            let stockText = "";
+
+            let stockClass =
+                "stock";
+
+
+
+            /*
+            STOCK STATUS
+            */
+
+            if (
+                item.stock <= 0
+            ) {
+
+                stockText =
+                    "Out of stock";
+
+                stockClass +=
+                    " out-stock";
+
+            }
+
+            else if (
+                item.stock <= 5
+            ) {
+
+                stockText =
+                    "Only " +
+                    item.stock +
+                    " left";
+
+                stockClass +=
+                    " low-stock";
+
+            }
+
+            else {
+
+                stockText =
+                    "In stock: " +
+                    item.stock;
+
+            }
+
+
+
+            /*
+            PRODUCT HTML
+            */
+
+            productElement.innerHTML = `
+
+                <div class="product-image">
+
+                    <img
+                        src="${item.image}"
+                        alt="${item.name}"
+                    >
+
+                </div>
+
+
+                <div class="product-name">
+
+                    ${item.name}
+
+                </div>
+
+
+                <div class="price">
+
+                    $${item.price.toFixed(2)}
+
+                </div>
+
+
+                <div
+                    class="${stockClass}"
+                >
+
+                    ${stockText}
+
+                </div>
+
+
+                <button
+                    class="buy-now"
+                    type="button"
+                >
+
+                    Buy Now
+
+                </button>
+
+            `;
+
+
+
+            /*
+            BUY BUTTON
+            */
+
+            const buyButton =
+                productElement.querySelector(
+                    ".buy-now"
+                );
+
+
+            buyButton.addEventListener(
+                "click",
+                function() {
+
+
+                    if (
+                        item.stock <= 0
+                    ) {
+
+                        alert(
+                            "Sorry, this item is currently out of stock."
+                        );
+
+                        return;
+
+                    }
+
+
+                    openPurchaseModal(
+                        item
+                    );
+
+                }
+            );
+
+
+
+            productsContainer.appendChild(
+                productElement
+            );
+
+        }
+    );
+
+}
+
+
+
+/*
+====================================================
+SORT PRODUCTS
+====================================================
+*/
+
+sortMenu.addEventListener(
+    "change",
+    function() {
+
+
+        let sortedProducts =
+            [...PRODUCT_LIST];
+
+
+
+        /*
+        FEATURED
+        */
+
+        if (
+            this.value ===
+            "featured"
+        ) {
+
+            sortedProducts =
+                [...PRODUCT_LIST];
+
+        }
+
+
+
+        /*
+        LOW TO HIGH
+        */
+
+        else if (
+            this.value ===
+            "low"
+        ) {
+
+            sortedProducts.sort(
+                function(a, b) {
+
+                    return (
+                        a.price -
+                        b.price
+                    );
+
+                }
+            );
+
+        }
+
+
+
+        /*
+        HIGH TO LOW
+        */
+
+        else if (
+            this.value ===
+            "high"
+        ) {
+
+            sortedProducts.sort(
+                function(a, b) {
+
+                    return (
+                        b.price -
+                        a.price
+                    );
+
+                }
+            );
+
+        }
+
+
+
+        displayProducts(
+            sortedProducts
+        );
+
+    }
+);
+
+
+
+/*
+====================================================
+LOAD PRODUCTS
+====================================================
+*/
+
+displayProducts(
+    PRODUCT_LIST
+);
+
+
+</script>
+
+</body>
+
+</html>
